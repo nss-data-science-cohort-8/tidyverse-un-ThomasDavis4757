@@ -1,0 +1,146 @@
+
+
+```{r}
+library(tidyverse)
+```
+
+
+
+
+```{r}
+gdp_df <- read.csv("../data/gdp_per_capita.csv")
+```
+```{r}
+  tail(gdp_df,n=10)
+```
+
+```{r}
+head(gdp_df, n=10)
+```
+
+```{r}
+gdp_df
+```
+
+```{r}
+# hello testing
+gdp_df <- gdp_df |> 
+  select(-'Value.Footnotes')
+```
+
+```{r}
+#  #3
+gdp_df |> 
+  count(Year) |> 
+  arrange(desc(Year))
+```
+
+```{r}
+year_counts <- gdp_df |> 
+  count(Year) |> 
+  arrange(Year)
+```
+The years go from 1990 -> 2022, and the graph will show how many observations there are for each year. 
+
+```{r}
+ggplot(year_counts, aes(x = Year, y = n)) + geom_point()
+```
+#4 
+
+```{r}
+country_counts <- gdp_df |> 
+  count(Country.or.Area) |> 
+  arrange(n)
+```
+
+```{r}
+country_counts
+```
+There are 242 countries in the dataframe, and Djibouti has the fewest observations. (We know this because we did arrange and didn't say desc, so it is ascending.)
+
+
+#5
+
+```{r}
+gdp_2021 <- gdp_df |> 
+  filter(Year == 2021)
+```
+
+
+```{r}
+gdp_2021
+```
+
+#6 
+
+
+```{r}
+summary(gdp_2021)
+```
+#7
+
+
+```{r}
+ggplot(gdp_2021, aes(x = Value)) + geom_histogram(bins = 25)
+```
+
+#8
+
+  
+```{r}
+
+gdp_2021 <- gdp_2021  |> 
+  arrange(desc(Value))
+```
+  
+```{r}
+head(gdp_2021, n=5)
+```
+```{r}
+tail(gdp_2021, n=5)
+```
+  The top 5 were Luxembourg, Singapore, Ireland, Qatar, Bermuda
+  The bottom 5 were Niger, Somalia, Dem. Rep. Congo, Central African Republic, and Burundi.
+  
+  #9
+  
+```{r}
+```
+
+
+```{r}
+gdp_pivoted <- gdp_df |> 
+  filter(Year == 2021 | Year == 1990) |> 
+  pivot_wider(names_from = Year, values_from = Value) |> 
+  drop_na()
+```
+  
+  
+```{r}
+gdp_pivoted
+```
+
+#10
+
+
+```{r}
+
+```
+
+
+
+```{r}
+gdp_pivoted
+```
+
+
+```{r}
+gdp_pivoted <- gdp_pivoted |> 
+  mutate(Percent_Change = (100 * (`2021` - `1990`)) / `1990`)
+```
+
+```{r}
+gdp_pivoted
+```
+
+  
