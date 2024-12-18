@@ -2,6 +2,7 @@
 
 ```{r}
 library(tidyverse)
+library(dplyr)
 ```
 
 
@@ -143,4 +144,157 @@ gdp_pivoted <- gdp_pivoted |>
 gdp_pivoted
 ```
 
+#11
+
+
   
+```{r}
+gdp_pivoted |> 
+  filter(Percent_Change < 0)
+```
+  19 countries experiences a negative percent change from 1990 to 2021
+  
+  
+  #12
+  
+```{r}
+gdp_pivoted |> 
+  arrange(desc(Percent_Change))
+          
+```
+  Equatorial Guinea has the largest percent change
+  
+```{r}
+gdp_df_top <- gdp_df |> 
+  filter(Country.or.Area == 'Equatorial Guinea' | Country.or.Area == 'China')
+```
+  
+```{r}
+ggplot(gdp_df_top, aes(x = Year, y = Value, color = Country.or.Area)) + geom_line()
+```
+
+#13 
+
+```{r}
+continents <- read.csv("../data/continents.csv")
+```
+
+#14
+
+
+```{r}
+gdp_df <- gdp_df |> 
+  rename(Country = Country.or.Area)
+```
+
+
+
+
+
+```{r}
+gdp_df <- inner_join(continents, gdp_df, by = 'Country')
+```
+
+#15 Determine number of countries per continent, do a bar graph of it.
+
+
+```{r}
+gdp_df_countries <- gdp_df |> 
+  group_by(Continent) |> 
+  summarize(CountryCount = n_distinct(Country))
+```
+
+```{r}
+ggplot(gdp_df_countries, aes(x = Continent, y = CountryCount)) + geom_col()
+```
+
+#16
+```{r}
+gdp_2021 <- gdp_df |> 
+  filter(Year == 2021)
+
+gdp_2021
+```
+
+```{r}
+ggplot(gdp_2021, aes(x = Value, y = Continent)) + geom_boxplot()
+```
+I notice that Europe has the highest median gdp_per_capita value and the highest outliers, while Africa has the lowest median.
+
+#17
+
+```{r}
+life_expectancy <- read.csv("../data/life_expectancy.csv", skip = 3)
+life_expectancy
+```
+#18
+```{r}
+life_expectancy <- life_expectancy |> 
+  select(-Country.Code, -Indicator.Name, -Indicator.Code) |> 
+  pivot_longer(cols = -Country.Name, names_to = "Year", values_to = "Life_Expectancy") |> 
+  rename(Country = Country.Name) |> 
+  mutate(Year = as.integer(str_remove(Year, "^X")))
+  
+
+life_expectancy
+```
+#19
+
+
+```{r}
+life_expectancy |> 
+  filter(Life_Expectancy >= 80) |> 
+  arrange(Year)
+```
+It was Japan in 1996 that was the first country to exceed a life expectancy of 80 years.
+
+
+#20
+
+```{r}
+gdp_le <- inner_join(gdp_df, life_expectancy, by = c("Country", "Year"))
+gdp_le
+```
+
+#21
+
+```{r}
+gdp_le_2021 <- gdp_le |> 
+  filter(Year == 2021)
+
+gdp_le_2021 |> 
+  filter(Life_Expectancy >= 80)
+```
+
+31 countries had atleast a life expectancy of 80 in the year of 2021
+
+#22
+
+```{r}
+gdp_le_2021 |> 
+  arrange(desc(Value))
+
+gdp_life_exp_top3 <- gdp_le |> 
+  filter(Country == "Luxembourg" | Country == "Singapore" | Country == "Ireland")
+
+gdp_life_exp_top3
+
+ggplot(gdp_life_exp_top3, aes(x = Year, y = Life_Expectancy)) + geom_line() + facet_wrap(~Country)
+```
+
+#23
+
+```{r}
+ggplot(gdp_le_2021, aes(x = Life_Expectancy, y = Value)) + geom_point()
+```
+The GDP_Per_Capita seems to go up exponentially with the life expectancy going up. It could also be said the same way vice versa. 
+
+#24
+
+```{r}
+install.packages("corrr")
+library(corrr)
+
+correlate(gdp_le_2021 |> select(Life_Expectancy, Value))
+```
+The correlation value we got was .745, which means it correlates decently well with 1 being perfectly.
