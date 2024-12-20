@@ -298,3 +298,25 @@ library(corrr)
 correlate(gdp_le_2021 |> select(Life_Expectancy, Value))
 ```
 The correlation value we got was .745, which means it correlates decently well with 1 being perfectly.
+
+#25
+
+```{r}
+gdp_le_2021 <- gdp_le_2021 |> 
+  mutate(gdp_log = log(Value))
+
+gdp_le_2021
+```
+
+```{r}
+correlate(gdp_le_2021 |> select(Life_Expectancy, gdp_log))
+```
+The correlation factor is better in this one than the previous, with it being closer to 1.
+
+```{r}
+ggplot(gdp_le_2021, aes(x = Life_Expectancy, y = gdp_log)) + geom_point()
+```
+this looks like a more linear line now than before.
+
+
+
